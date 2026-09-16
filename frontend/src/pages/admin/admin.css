@@ -8,17 +8,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: var(--hairline);
 }
 
 .badge-status {
-  background: var(--card);
+  background: var(--surface);
   border: 1px solid var(--line-strong);
   color: var(--accent-deep);
   text-transform: uppercase;
 }
 
-.admin-waiting { padding: 44px; max-width: 520px; margin: 40px auto; }
+.admin-waiting { padding: 44px 0; max-width: 520px; margin: 40px auto; }
 
 .name-pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 16px 0; }
 
@@ -34,7 +36,7 @@
 .admin-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 20px;
+  gap: 32px;
   align-items: start;
 }
 
@@ -44,11 +46,15 @@
 
 .admin-main { display: flex; flex-direction: column; gap: 16px; }
 
-.control-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.control-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
 
 .admin-action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
 
-.player-table { padding: 20px; }
+.player-table {
+  padding-left: 20px;
+  border-left: var(--hairline);
+}
+.player-table h3 { font-size: 1.1em; text-transform: uppercase; margin-bottom: 12px; }
 .player-table table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
 .player-table th {
   text-align: left;
@@ -63,3 +69,43 @@
 .player-table tr.disconnected { opacity: 0.45; }
 
 .price-input { width: 76px; }
+
+/* ---------- Grant / re-offer / late-joiner tools ---------- */
+
+.grant-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.reoffer-list {
+  margin-top: 4px;
+  padding-top: 4px;
+}
+
+.reoffer-list h4 {
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  margin-bottom: 6px;
+}
+
+.reoffer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+.reoffer-row:last-child { border-bottom: none; }
+.reoffer-row span { flex: 1; font-weight: 600; }
+
+.suggestion-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}

@@ -78,7 +78,10 @@ def _broadcast():
 
 
 @app.route("/")
-def index():
+@app.route("/play/<path:_subpath>")
+def index(_subpath=None):
+    # React Router owns everything under /play/* client-side - the server
+    # just needs to hand back the same shell on a direct load or refresh.
     return send_from_directory("static/app", "index.html")
 
 

@@ -13,7 +13,7 @@ export default function Landing({ onAdminReady, onParticipantReady }) {
     <div className="landing">
       <div className="landing-hero">
         <h1>
-          <span className="topbar-logo-mark">UX</span> <span className="topbar-logo-script">Auction</span>
+          <span className="topbar-logo-mark">UX</span> <span className="topbar-logo-script">WARS</span>
         </h1>
         <p className="muted">Think. Bid. Solve. Pick your role to continue.</p>
       </div>

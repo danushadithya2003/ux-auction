@@ -1,6 +1,5 @@
-// Each category gets a consistent accent color + a simple flat
-// illustration (hand-drawn placeholder art, swappable later for real
-// images without touching any layout code).
+// Each category gets a consistent accent color, used sparingly for tags
+// and eyebrow labels - not big decorative blocks.
 
 export const CATEGORY_COLORS = [
   { accent: "#5B7FA6", soft: "#EAF1F8", name: "blue" },

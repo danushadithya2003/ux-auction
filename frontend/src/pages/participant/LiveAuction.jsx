@@ -1,14 +1,12 @@
 import { useParticipant } from "../../context/ParticipantContext";
 import CategoryTabs from "../../components/CategoryTabs";
-import CategoryIllustration from "../../components/CategoryIllustration";
 import TimerRing from "../../components/TimerRing";
 import BudgetAndCollectionStrip from "../../components/BudgetAndCollectionStrip";
 import useAnimatedNumber from "../../hooks/useAnimatedNumber";
-import { colorForCategory } from "../../theme/categories";
 import "../../components/components.css";
 
 export default function LiveAuction() {
-  const { state, bid } = useParticipant();
+  const { state, bid, soldFlash } = useParticipant();
 
   if (state.status === "LOBBY" || state.status === "PLANNING") {
     return <WaitingCard state={state} />;
@@ -25,13 +23,16 @@ export default function LiveAuction() {
         <div className="banner banner-pause">The Auctioneer has paused the auction. Hang tight.</div>
       )}
 
-      {state.currentItem ? (
-        <ItemCard state={state} bid={bid} />
-      ) : state.allCategoriesClosed ? (
-        <div className="banner banner-success">All categories are complete. Waiting for the Auctioneer to end the auction.</div>
-      ) : (
-        <div className="banner">Waiting for the next item…</div>
-      )}
+      <div className="item-stage">
+        {soldFlash && <SoldOverlay flash={soldFlash} />}
+        {state.currentItem ? (
+          <ItemHero state={state} bid={bid} />
+        ) : state.allCategoriesClosed ? (
+          <div className="banner banner-success">All categories are complete. Waiting for the Auctioneer to end the auction.</div>
+        ) : (
+          <div className="banner">Waiting for the next item…</div>
+        )}
+      </div>
 
       <BudgetAndCollectionStrip state={state} />
     </div>
@@ -55,91 +56,74 @@ function WaitingCard({ state }) {
   );
 }
 
-function ItemCard({ state, bid }) {
+function SoldOverlay({ flash }) {
+  return (
+    <div className="sold-overlay">
+      <div className="sold-overlay-label">SOLD</div>
+      <div className="sold-overlay-winner">{flash.winner}</div>
+      <div className="sold-overlay-price">
+        {flash.name} · {flash.price}c
+      </div>
+    </div>
+  );
+}
+
+function ItemHero({ state, bid }) {
   const item = state.currentItem;
-  const categories = state.categories;
-  const catIndex = categories.findIndex((c) => c.name === state.currentCategoryName);
-  const cat = categories[catIndex];
-  const posInCategory = cat ? cat.items.findIndex((it) => it.id === item.id) + 1 : null;
-  const theme = colorForCategory(cat?.id, categories);
 
   const animatedBid = useAnimatedNumber(item.currentBid ?? item.startingPrice);
 
   return (
-    <div className="item-card">
-      <div className="item-card-top">
-        <span className="item-card-tag" style={{ background: theme.soft, color: theme.accent }}>
-          {state.currentCategoryName}
-        </span>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span className="badge badge-live">LIVE</span>
-          {posInCategory && cat && (
-            <span className="item-card-progress">
-              {posInCategory} / {cat.items.length}
-            </span>
-          )}
-        </div>
+    <div className="item-hero">
+      <div className="item-hero-top">
+        <span className="eyebrow">{state.currentCategoryName}</span>
+        <span className="badge badge-live">Live</span>
       </div>
 
-      <h2 className="item-card-name">{item.name}</h2>
-      <p className="item-card-desc">{item.description}</p>
+      <h1 className="item-hero-name">{item.name}</h1>
+      <p className="item-hero-desc">{item.description}</p>
 
-      <div className="item-card-body">
-        <CategoryIllustration index={catIndex} categoryName={state.currentCategoryName} />
-
+      <div className="item-hero-stats">
         <div>
-          <div className="item-card-stats">
-            <div>
-              <div className="stat-label">Current Bid</div>
-              <div className="stat-value">{item.currentBid != null ? `${animatedBid}c` : `${item.startingPrice}c start`}</div>
-            </div>
-            <div>
-              <div className="stat-label">Highest Bidder</div>
-              <div className="bidder-row">
-                {item.currentBidderName && <span className="avatar-circle" style={{ width: 26, height: 26, fontSize: "0.8em" }}>{item.currentBidderName.charAt(0)}</span>}
-                <span className="stat-value-sm">{item.currentBidderName || "—"}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="meta-row">
-            <span>
-              Starting bid <strong>{item.startingPrice}c</strong>
-            </span>
-            {item.status === "BIDDING" && (
-              <span style={{ marginLeft: "auto" }}>
-                <TimerRing secondsRemaining={item.timeRemaining} size={38} />
-              </span>
-            )}
-          </div>
-
-          <BidControls state={state} item={item} bid={bid} />
+          <div className="stat-label">Current Bid</div>
+          <div className="stat-value stat-value-accent">{item.currentBid != null ? `${animatedBid}c` : `${item.startingPrice}c start`}</div>
         </div>
+        <div>
+          <div className="stat-label">Leading Player</div>
+          <div className="stat-value stat-value-sm">{item.currentBidderName || "No bids yet"}</div>
+        </div>
+        {item.status === "BIDDING" && (
+          <div className="timer-slot">
+            <TimerRing secondsRemaining={item.timeRemaining} size={44} />
+          </div>
+        )}
       </div>
+
+      <BidControls state={state} item={item} bid={bid} />
     </div>
   );
 }
 
 function BidControls({ state, item, bid }) {
   if (item.status === "PENDING_CONFIRM") {
-    return <p className="muted small">Bidding closed — waiting for the Auctioneer to confirm.</p>;
+    return <p className="muted">Going once… waiting for the Auctioneer to confirm.</p>;
   }
   if (state.status === "PAUSED") {
-    return <p className="muted small">Bidding is paused.</p>;
+    return <p className="muted">Bidding is paused.</p>;
   }
   if (item.status !== "BIDDING") return null;
   if (item.isMine) {
-    return <p className="highest-mine">✓ You're the highest bidder</p>;
+    return <p className="highest-mine">You're leading — hold your nerve.</p>;
   }
   if (item.bidOptions.length === 0) {
-    return <p className="muted small">No affordable bid available right now — your budget is reserved for other categories.</p>;
+    return <p className="muted">Your budget is getting nervous — nothing affordable without breaking a category.</p>;
   }
   return (
     <div className="bid-options">
-      {item.bidOptions.map((amount) => (
+      {item.bidOptions.map((amount, i) => (
         <button
           key={amount}
-          className="bid-pill"
+          className={`bid-pill${i === 1 ? " bid-pill-recommended" : ""}`}
           onClick={async (e) => {
             e.currentTarget.disabled = true;
             try {
@@ -151,7 +135,7 @@ function BidControls({ state, item, bid }) {
             }
           }}
         >
-          {amount}c
+          Bid {amount}c
         </button>
       ))}
     </div>

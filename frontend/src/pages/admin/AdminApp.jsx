@@ -2,14 +2,12 @@ import { useState } from "react";
 import { useAdmin } from "../../context/AdminContext";
 import AuctionSummary from "../../components/AuctionSummary";
 import TimerRing from "../../components/TimerRing";
-import CategoryIllustration from "../../components/CategoryIllustration";
-import { colorForCategory } from "../../theme/categories";
 import { clearAdminSession } from "../../api/store";
 import "../../components/components.css";
 import "./admin.css";
 
 export default function AdminApp() {
-  const { state, act } = useAdmin();
+  const { state, act, soldFlash } = useAdmin();
   if (!state) return <p className="muted" style={{ padding: 40 }}>Loading…</p>;
 
   if (state.role === "summary") {
@@ -38,7 +36,7 @@ export default function AdminApp() {
       {state.status === "PLANNING" && (
         <WaitingPanel title="Planning phase" subtitle="Participants are browsing the items." state={state} onGo={() => act("begin_bidding")} goLabel="Begin Bidding →" />
       )}
-      {(state.status === "LIVE" || state.status === "PAUSED") && <LiveDashboard state={state} act={act} />}
+      {(state.status === "LIVE" || state.status === "PAUSED") && <LiveDashboard state={state} act={act} soldFlash={soldFlash} />}
     </div>
   );
 }
@@ -47,7 +45,7 @@ function AdminTopbar({ state }) {
   return (
     <header className="admin-topbar">
       <div className="topbar-logo">
-        <span className="topbar-logo-mark">UX</span> <span className="topbar-logo-script">Auction</span>
+        <span className="topbar-logo-mark">UX</span> <span className="topbar-logo-script">WARS</span>
         <div className="topbar-tagline">Auctioneer console</div>
       </div>
       <span className="badge badge-status">{state.status}</span>
@@ -57,7 +55,7 @@ function AdminTopbar({ state }) {
 
 function WaitingPanel({ title, subtitle, state, onGo, goLabel }) {
   return (
-    <div className="card center-panel admin-waiting">
+    <div className="admin-waiting center-panel">
       <div className="room-code" style={{ margin: "0 auto 18px", cursor: "default" }}>
         <span className="faint small">Invite code</span> <strong>{state.code}</strong>
       </div>
@@ -78,22 +76,33 @@ function WaitingPanel({ title, subtitle, state, onGo, goLabel }) {
   );
 }
 
-function LiveDashboard({ state, act }) {
+function LiveDashboard({ state, act, soldFlash }) {
   return (
     <div className="admin-grid">
       <div className="admin-main">
-        {state.currentItem ? (
-          <CurrentItemAdmin state={state} act={act} />
-        ) : state.allCategoriesClosed ? (
-          <div className="banner banner-success">
-            <p>All categories are complete.</p>
-            <button className="btn btn-primary" onClick={() => confirmThen("End the auction for everyone?", () => act("end_auction"))}>
-              End Auction
-            </button>
-          </div>
-        ) : (
-          <CategoryCloseArea state={state} act={act} />
-        )}
+        <div className="item-stage">
+          {soldFlash && (
+            <div className="sold-overlay">
+              <div className="sold-overlay-label">Sold</div>
+              <div className="sold-overlay-winner">{soldFlash.winner}</div>
+              <div className="sold-overlay-price">
+                {soldFlash.name} · {soldFlash.price}c
+              </div>
+            </div>
+          )}
+          {state.currentItem ? (
+            <CurrentItemAdmin state={state} act={act} />
+          ) : state.allCategoriesClosed ? (
+            <div className="banner banner-success">
+              <p>All categories are complete.</p>
+              <button className="btn btn-primary" onClick={() => confirmThen("End the auction for everyone?", () => act("end_auction"))}>
+                End Auction
+              </button>
+            </div>
+          ) : (
+            <CategoryCloseArea state={state} act={act} />
+          )}
+        </div>
 
         {state.missingGrantSuggestions.length > 0 && <MissingGrantSuggestions state={state} act={act} />}
 
@@ -124,50 +133,40 @@ function LiveDashboard({ state, act }) {
 
 function CurrentItemAdmin({ state, act }) {
   const item = state.currentItem;
-  const catIndex = state.categories.findIndex((c) => c.id === state.currentCategoryId);
-  const theme = colorForCategory(state.currentCategoryId, state.categories);
   const canConfirm = !!item.currentBidderName;
 
   return (
-    <div className="item-card">
-      <div className="item-card-top">
-        <span className="item-card-tag" style={{ background: theme.soft, color: theme.accent }}>
-          {state.currentCategoryName}
-        </span>
+    <div className="item-hero">
+      <div className="item-hero-top">
+        <span className="eyebrow">{state.currentCategoryName}</span>
         <span className="badge" style={{ background: "var(--accent-soft)", color: "var(--accent-deep)" }}>
           {item.tier}
         </span>
       </div>
-      <h2 className="item-card-name">{item.name}</h2>
-      <p className="item-card-desc">{item.description}</p>
-      <div className="item-card-body">
-        <CategoryIllustration index={catIndex} categoryName={state.currentCategoryName} />
+      <h1 className="item-hero-name">{item.name}</h1>
+      <p className="item-hero-desc">{item.description}</p>
+      <div className="item-hero-stats">
         <div>
-          <div className="item-card-stats">
-            <div>
-              <div className="stat-label">Current Bid</div>
-              <div className="stat-value">{item.currentBid != null ? `${item.currentBid}c` : `${item.startingPrice}c start`}</div>
-            </div>
-            <div>
-              <div className="stat-label">Highest Bidder</div>
-              <div className="stat-value-sm">{item.currentBidderName || "—"}</div>
-            </div>
-            {item.status === "BIDDING" && (
-              <div>
-                <div className="stat-label">Time Left</div>
-                <TimerRing secondsRemaining={item.timeRemaining} size={40} />
-              </div>
-            )}
-          </div>
-          <div className="admin-action-row">
-            <button className="btn btn-success" disabled={!canConfirm} onClick={() => act("confirm_sale")}>
-              {canConfirm ? `Confirm Sale to ${item.currentBidderName}` : "Confirm Sale"}
-            </button>
-            <button className="btn btn-danger" onClick={() => act("skip_item")}>
-              Skip / No Sale
-            </button>
-          </div>
+          <div className="stat-label">Current Bid</div>
+          <div className="stat-value stat-value-accent">{item.currentBid != null ? `${item.currentBid}c` : `${item.startingPrice}c start`}</div>
         </div>
+        <div>
+          <div className="stat-label">Highest Bidder</div>
+          <div className="stat-value stat-value-sm">{item.currentBidderName || "—"}</div>
+        </div>
+        {item.status === "BIDDING" && (
+          <div className="timer-slot">
+            <TimerRing secondsRemaining={item.timeRemaining} size={40} />
+          </div>
+        )}
+      </div>
+      <div className="admin-action-row">
+        <button className="btn btn-success" disabled={!canConfirm} onClick={() => act("confirm_sale")}>
+          {canConfirm ? `Confirm Sale to ${item.currentBidderName}` : "Confirm Sale"}
+        </button>
+        <button className="btn btn-danger" onClick={() => act("skip_item")}>
+          Skip / No Sale
+        </button>
       </div>
     </div>
   );
@@ -237,7 +236,7 @@ function GrantForm({ state, available, missingNames, act }) {
 
 function ReofferList({ reofferables, act }) {
   return (
-    <div className="card reoffer-list">
+    <div className="reoffer-list">
       <h4>Unsold — re-offer at a new price</h4>
       {reofferables.map((it) => (
         <ReofferRow key={it.id} item={it} act={act} />
@@ -282,7 +281,7 @@ function MissingGrantSuggestions({ state, act }) {
 
 function PlayerTable({ state }) {
   return (
-    <div className="card player-table">
+    <div className="player-table">
       <h3>Players</h3>
       <table>
         <thead>

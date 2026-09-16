@@ -14,7 +14,7 @@ export default function Topbar({ code, name, right }) {
   return (
     <header className="topbar">
       <div className="topbar-logo">
-        <span className="topbar-logo-mark">UX</span> <span className="topbar-logo-script">Auction</span>
+        <span className="topbar-logo-mark">UX</span> <span className="topbar-logo-script">WARS</span>
         <div className="topbar-tagline">Think. Bid. Solve.</div>
       </div>
       <div className="topbar-right">

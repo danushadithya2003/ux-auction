@@ -31,7 +31,7 @@ export default function HowItWorks() {
 
       <div className="how-it-works-list">
         {STEPS.map((s, i) => (
-          <div className="card how-it-works-step" key={s.title}>
+          <div className="how-it-works-step" key={s.title}>
             <div className="how-it-works-num">{i + 1}</div>
             <div>
               <h4>{s.title}</h4>

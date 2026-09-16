@@ -1,45 +1,45 @@
 /* ============================================================
-   UX Auction — warm, paper-cream theme with a serif logo/headline
-   face, amber accents, and a persistent sidebar. Matches the
-   reference mockup rather than a generic dashboard.
+   UX WARS — a premium game HUD, not a SaaS dashboard.
+   Light warm canvas, bold condensed type, amber used sparingly
+   for the things that matter (bids, live state, key actions).
+   The page is the canvas — panels/cards are the exception, not
+   the default.
    ============================================================ */
 
 :root {
-  --bg: #f8f3e7;
-  --bg-deep: #f2ead9;
-  --card: #ffffff;
-  --card-tint: #fbf7ee;
-  --line: #ece3d0;
-  --line-strong: #e0d3b8;
+  --bg: #faf7f1;
+  --bg-deep: #f1ece1;
+  --surface: #ffffff;
+  --line: #e6ded0;
+  --line-strong: #d6cab3;
 
-  --ink: #2b2118;
-  --ink-dim: #8a7f6d;
-  --ink-faint: #b3a891;
+  --ink: #201c16;
+  --ink-dim: #6e675a;
+  --ink-faint: #a49b89;
 
-  --accent: #b8860b;
-  --accent-deep: #8b5e1f;
-  --accent-soft: #f3e4c8;
-  --accent-ink: #2a1a00;
+  --accent: #e58f2a;
+  --accent-deep: #a85e13;
+  --accent-soft: #fbead0;
+  --accent-ink: #241300;
 
-  --live: #e8637a;
-  --live-bg: #fdecef;
+  --live: #d8455a;
+  --live-bg: #fbe9ea;
 
-  --success: #4c8c5b;
-  --success-bg: #e9f4ea;
-  --warning: #c98a2c;
-  --warning-bg: #fbf0dc;
-  --danger: #c85a4a;
-  --danger-bg: #fbeae7;
-  --info: #5b7fa6;
-  --info-bg: #eaf1f8;
+  --success: #3f8a54;
+  --success-bg: #e8f3ea;
+  --warning: #b9791f;
+  --warning-bg: #faf0da;
+  --danger: #c04a3d;
+  --danger-bg: #fbeae6;
+  --info: #4f6f95;
+  --info-bg: #eaf0f7;
 
-  --radius-lg: 20px;
-  --radius: 14px;
-  --radius-sm: 10px;
-  --shadow: 0 10px 30px -12px rgba(43, 33, 24, 0.18);
-  --shadow-lifted: 0 16px 40px -14px rgba(43, 33, 24, 0.26);
+  --radius-lg: 14px;
+  --radius: 10px;
+  --radius-sm: 7px;
+  --hairline: 1px solid var(--line);
 
-  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
   --font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   color-scheme: light;
@@ -62,8 +62,8 @@ body {
 h1, h2, h3, h4 {
   margin: 0 0 6px 0;
   font-family: var(--font-display);
-  font-weight: 600;
-  line-height: 1.15;
+  font-weight: 700;
+  line-height: 1.05;
   letter-spacing: -0.01em;
   color: var(--ink);
 }
@@ -79,16 +79,33 @@ button { font-family: inherit; }
 .small { font-size: 0.85em; }
 .error { color: var(--danger); }
 
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.72em;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+}
+
+.divider {
+  border: none;
+  border-top: var(--hairline);
+  margin: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
 
 /* ---------- shared primitives ---------- */
 
+/* Used only where grouping genuinely helps (forms, the join screen) -
+   a hairline border, not a floating shadow card. */
 .card {
-  background: var(--card);
+  background: var(--surface);
+  border: var(--hairline);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
 }
 
 .btn {
@@ -96,23 +113,22 @@ button { font-family: inherit; }
   font-weight: 700;
   font-size: 0.95em;
   padding: 11px 20px;
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   border: 1.5px solid transparent;
   cursor: pointer;
   letter-spacing: 0.01em;
-  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
-  background: var(--card);
+  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  background: var(--surface);
 }
 
 .btn:active:not(:disabled) { transform: scale(0.96); }
-.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .btn-primary {
-  background: var(--accent-deep);
-  color: #fff9ec;
-  box-shadow: 0 10px 24px -10px rgba(139, 94, 31, 0.55);
+  background: var(--accent);
+  color: var(--accent-ink);
 }
-.btn-primary:hover:not(:disabled) { background: var(--accent); transform: translateY(-2px); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-deep); color: #fff9ec; }
 
 .btn-outline {
   background: transparent;
@@ -122,9 +138,9 @@ button { font-family: inherit; }
 .btn-outline:hover:not(:disabled) { border-color: var(--accent-deep); color: var(--accent-deep); }
 
 .btn-outline-selected {
-  background: var(--accent-deep);
-  border-color: var(--accent-deep);
-  color: #fff9ec;
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
 }
 
 .btn-danger {
@@ -138,7 +154,7 @@ button { font-family: inherit; }
   background: var(--success);
   color: #fff;
 }
-.btn-success:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-2px); }
+.btn-success:hover:not(:disabled) { filter: brightness(1.08); }
 
 .btn-text {
   background: transparent;
@@ -154,7 +170,7 @@ button { font-family: inherit; }
   padding: 11px 14px;
   border: 1.5px solid var(--line-strong);
   border-radius: var(--radius-sm);
-  background: var(--card-tint);
+  background: var(--surface);
   color: var(--ink);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -162,8 +178,7 @@ button { font-family: inherit; }
 .input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-soft);
-  background: var(--card);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .badge {
@@ -171,10 +186,11 @@ button { font-family: inherit; }
   align-items: center;
   gap: 6px;
   border-radius: 999px;
-  padding: 5px 13px;
-  font-size: 0.78em;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  padding: 4px 12px;
+  font-size: 0.75em;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .badge-live {
@@ -189,30 +205,59 @@ button { font-family: inherit; }
   animation: blink 1.4s ease-in-out infinite;
 }
 
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
 
 @keyframes pop-in {
-  from { opacity: 0; transform: translateY(10px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulse-once {
-  0% { transform: scale(0.9); }
+  0% { transform: scale(0.92); }
   50% { transform: scale(1.05); }
   100% { transform: scale(1); }
+}
+
+/* ---------- HUD stat: big number, small label beneath ---------- */
+
+.hud-row {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.hud-stat { display: flex; flex-direction: column; gap: 1px; }
+
+.hud-value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.9em;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.hud-value-accent { color: var(--accent-deep); }
+
+.hud-label {
+  font-size: 0.68em;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
 }
 
 /* ---------- Circular countdown ring ---------- */
 
 .timer-ring-track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.35);
+  stroke: var(--line-strong);
   stroke-width: 5;
 }
 
 .timer-ring-fill {
   fill: none;
-  stroke: #fff;
+  stroke: var(--accent-deep);
   stroke-width: 5;
   stroke-linecap: round;
   stroke-dasharray: 151;
@@ -235,4 +280,46 @@ button { font-family: inherit; }
 @keyframes pulse-ring {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
+}
+
+/* ---------- SOLD moment ---------- */
+
+.sold-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  animation: sold-in 0.25s ease both;
+}
+
+.sold-overlay-label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 3em;
+  letter-spacing: 0.03em;
+  color: var(--accent-deep);
+}
+
+.sold-overlay-winner {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.6em;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+
+.sold-overlay-price {
+  font-size: 1em;
+  color: var(--ink-dim);
+  font-weight: 700;
+}
+
+@keyframes sold-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
 }

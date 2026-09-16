@@ -1,44 +1,26 @@
 import { useParticipant } from "../../context/ParticipantContext";
-import { colorForCategory } from "../../theme/categories";
 import "../../components/components.css";
 
 export default function Players() {
   const { state } = useParticipant();
+  const players = [...state.players].sort((a, b) => b.balance - a.balance);
 
   return (
     <div>
       <h2 style={{ marginBottom: 4 }}>Players</h2>
-      <p className="muted">See where everyone stands — budgets, and what they've picked up so far.</p>
+      <p className="muted">Who still has money to compete with you.</p>
 
-      <div className="players-grid">
-        {state.players.map((p) => (
-          <div key={p.id} className={`card players-card${p.isMe ? " players-card-me" : ""}${p.connected ? "" : " players-card-offline"}`}>
-            <div className="players-card-head">
-              <span className="avatar-circle">{p.name.charAt(0).toUpperCase()}</span>
-              <div>
-                <strong>
-                  {p.name}
-                  {p.isMe && <span className="muted small"> (you)</span>}
-                </strong>
-                <div className="muted small">{p.connected ? "Online" : "Offline"}</div>
-              </div>
-              <div className="players-balance">{p.balance}c</div>
-            </div>
-            <div className="players-progress">
-              {p.categoriesSecured}/{p.totalCategories} categories
-            </div>
-            {p.collection.length > 0 && (
-              <div className="players-items">
-                {p.collection.map((it, i) => {
-                  const theme = colorForCategory(it.categoryName, state.categories);
-                  return (
-                    <span key={i} className="collection-mini-tag" style={{ background: theme.soft, color: theme.accent }}>
-                      {it.name}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
+      <div className="players-list">
+        {players.map((p) => (
+          <div key={p.id} className={`players-row${p.isMe ? " is-me" : ""}${p.connected ? "" : " offline"}`}>
+            <span className="players-row-name">
+              {p.isMe ? "You" : p.name}
+              {!p.connected && <span className="muted small"> · offline</span>}
+            </span>
+            <span className="players-row-progress">
+              {p.categoriesSecured}/{p.totalCategories} cat · {p.collection.length} items
+            </span>
+            <span className="players-row-balance">{p.balance}c</span>
           </div>
         ))}
       </div>
