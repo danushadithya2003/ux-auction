@@ -1,0 +1,7 @@
+venv/
+.node/
+data/*.db
+frontend/node_modules/
+__pycache__/
+*.pyc
+static/app/.vite/

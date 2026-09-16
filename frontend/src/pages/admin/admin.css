@@ -1,0 +1,65 @@
+.admin-shell {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 24px 24px 60px;
+}
+
+.admin-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.badge-status {
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  color: var(--accent-deep);
+  text-transform: uppercase;
+}
+
+.admin-waiting { padding: 44px; max-width: 520px; margin: 40px auto; }
+
+.name-pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 16px 0; }
+
+.name-pill {
+  background: var(--info-bg);
+  color: var(--info);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.9em;
+  font-weight: 700;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .admin-grid { grid-template-columns: 1fr; }
+}
+
+.admin-main { display: flex; flex-direction: column; gap: 16px; }
+
+.control-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.admin-action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+.player-table { padding: 20px; }
+.player-table table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+.player-table th {
+  text-align: left;
+  padding: 6px 4px 10px;
+  font-size: 0.72em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-faint);
+  border-bottom: 2px solid var(--line);
+}
+.player-table td { padding: 9px 4px; border-bottom: 1px solid var(--line); font-weight: 600; }
+.player-table tr.disconnected { opacity: 0.45; }
+
+.price-input { width: 76px; }
