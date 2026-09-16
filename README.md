@@ -3,7 +3,26 @@
 A live, real-time auction app for the "UX Auction" team activity. One person runs it as the
 Auctioneer; everyone else joins from their own device (phone or laptop) using a short invite code.
 
-## Running it
+## It's hosted — just use the link
+
+**https://ux-wars.onrender.com**
+
+Anyone can open this directly (no local setup needed). It's on Render's free tier, which means:
+- The first request after ~15 minutes of no traffic takes about a minute to wake back up (Render
+  spun the instance down to save resources) — expected, not broken. Loading it once a few minutes
+  before a live session avoids that delay during the actual activity.
+- Storage is not persistent across a redeploy or an instance restart — an in-progress auction
+  won't survive one of those (a plain idle spin-down/wake-up is fine, everything resumes normally).
+
+If you ever need to redeploy: push to the `main` branch on GitHub (`danushadithya2003/ux-auction`)
+and Render redeploys automatically. **Important**: the start command must stay
+`gunicorn --workers 1 --threads 8 --worker-class gthread --timeout 120 --bind 0.0.0.0:$PORT app:app`
+(set in Render's dashboard under Settings → Start Command, and mirrored in `render.yaml`). Without
+`--worker-class gthread`, the server can only handle one connection at a time — the moment the
+Admin's live-updates connection opens, everything else stalls until gunicorn kills and restarts the
+worker, which is a real bug we hit and fixed during initial deployment.
+
+## Running it locally (for development)
 
 Open Terminal, then:
 
