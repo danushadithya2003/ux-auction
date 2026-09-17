@@ -65,7 +65,23 @@ export default function App() {
     <BrowserRouter>
       {mode === "loading" && <p className="muted" style={{ padding: 40 }}>Loading…</p>}
 
-      {mode === "summary" && summary && <AuctionSummary summary={summary} />}
+      {mode === "summary" && summary && (
+        <div>
+          <AuctionSummary summary={summary} />
+          <div style={{ textAlign: "center", paddingBottom: 40 }}>
+            <button
+              className="btn btn-outline"
+              onClick={() => {
+                clearAdminSession();
+                clearParticipantSession();
+                window.location.href = "/";
+              }}
+            >
+              Back to Start
+            </button>
+          </div>
+        </div>
+      )}
 
       {mode === "landing" && (
         <Landing
