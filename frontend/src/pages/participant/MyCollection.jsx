@@ -17,9 +17,9 @@ export default function MyCollection() {
       <p className="muted">Everything you've acquired so far, grouped by category.</p>
 
       <div className="category-chip-row">
-        {state.categoriesProgress.map((c) => (
+        {state.categoriesProgress.map((c, i) => (
           <span key={c.id} className={`category-chip${c.secured ? " category-chip-done" : ""}`}>
-            {c.secured ? "✓ " : ""}
+            {c.secured ? "✓ " : `${String(i + 1).padStart(2, "0")} · `}
             {c.name}
           </span>
         ))}

@@ -90,6 +90,8 @@ def lookup(code):
     code = code.strip().upper()
     with lock:
         if current_auction and current_auction.code == code:
+            if current_auction.status == "COMPLETED":
+                return jsonify({"found": True, "status": "COMPLETED", "summary": views.public_summary(current_auction)})
             return jsonify({"found": True, "status": current_auction.status})
     record = db.get_auction_by_code(code)
     if not record:

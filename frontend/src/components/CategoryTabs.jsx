@@ -7,7 +7,7 @@ import "./components.css";
 export default function CategoryTabs({ categories, activeId, onSelect, readOnly = false }) {
   return (
     <div className="category-tabs">
-      {categories.map((c) => {
+      {categories.map((c, i) => {
         const theme = colorForCategory(c.id, categories);
         const active = c.id === activeId;
         return (
@@ -17,6 +17,9 @@ export default function CategoryTabs({ categories, activeId, onSelect, readOnly 
             style={active ? { color: theme.accent, borderColor: theme.accent } : undefined}
             onClick={readOnly ? undefined : () => onSelect(c.id)}
           >
+            <span className="category-tab-num" style={active ? { color: theme.accent } : undefined}>
+              {String(i + 1).padStart(2, "0")}
+            </span>
             {c.name}
             {c.secured && <span className="category-tab-check">✓</span>}
           </button>

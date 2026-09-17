@@ -17,24 +17,24 @@
 
 .topbar-logo {
   font-family: var(--font-display);
-  font-size: 1.6em;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.01em;
+  font-size: 1.35em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   line-height: 1;
   color: var(--ink);
   position: relative;
 }
 
-.topbar-logo-mark { color: var(--ink); }
-.topbar-logo-script { color: var(--accent-deep); }
+.topbar-logo-mark { color: var(--navy-900); }
+.topbar-logo-script { color: var(--accent); }
 
 .topbar-tagline {
   font-family: var(--font-body);
-  font-size: 0.42em;
-  letter-spacing: 0.08em;
-  color: var(--ink-dim);
-  text-transform: uppercase;
+  font-size: 0.48em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  text-transform: none;
   margin-top: 2px;
 }
 
@@ -49,22 +49,22 @@
   align-items: center;
   gap: 8px;
   background: var(--bg-deep);
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
   padding: 8px 16px;
   cursor: pointer;
   font-family: var(--font-body);
   color: var(--ink);
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease-out;
 }
 .room-code:hover { border-color: var(--accent); }
-.room-code-copy { color: var(--accent-deep); font-weight: 600; font-size: 0.85em; }
+.room-code-copy { color: var(--accent); font-weight: 600; font-size: 0.85em; }
 
 .avatar-chip {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ink);
 }
 
@@ -121,6 +121,7 @@
 .sidebar-link-active {
   background: var(--accent-soft);
   color: var(--accent-deep);
+  font-weight: 600;
 }
 
 .sidebar-icon { font-size: 1.1em; }
@@ -128,18 +129,16 @@
 .sidebar-manifesto {
   padding: 20px 14px 0;
   color: var(--ink-faint);
-  font-family: var(--font-display);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  font-size: 0.95em;
-  line-height: 1.4;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 0.9em;
+  line-height: 1.5;
 }
 
 .sidebar-manifesto p { margin: 0; }
 
 .sidebar-divider {
-  width: 32px;
+  width: 24px;
   height: 2px;
   background: var(--accent);
   margin: 14px 0;
@@ -151,8 +150,8 @@
   font-size: 0.72em;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-weight: 700;
-  color: var(--ink-faint);
+  font-weight: 600;
+  color: var(--ink-faintest);
 }
 
 .app-main {

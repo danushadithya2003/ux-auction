@@ -2,6 +2,7 @@ import { useParticipant } from "../../context/ParticipantContext";
 import CategoryTabs from "../../components/CategoryTabs";
 import TimerRing from "../../components/TimerRing";
 import BudgetAndCollectionStrip from "../../components/BudgetAndCollectionStrip";
+import SoldPopup from "../../components/SoldPopup";
 import useAnimatedNumber from "../../hooks/useAnimatedNumber";
 import "../../components/components.css";
 
@@ -23,8 +24,9 @@ export default function LiveAuction() {
         <div className="banner banner-pause">The Auctioneer has paused the auction. Hang tight.</div>
       )}
 
+      <SoldPopup flash={soldFlash} />
+
       <div className="item-stage">
-        {soldFlash && <SoldOverlay flash={soldFlash} />}
         {state.currentItem ? (
           <ItemHero state={state} bid={bid} />
         ) : state.allCategoriesClosed ? (
@@ -52,18 +54,6 @@ function WaitingCard({ state }) {
           ? "The auction will begin shortly."
           : "Bidding hasn't started yet — browse All Items while you wait."}
       </p>
-    </div>
-  );
-}
-
-function SoldOverlay({ flash }) {
-  return (
-    <div className="sold-overlay">
-      <div className="sold-overlay-label">SOLD</div>
-      <div className="sold-overlay-winner">{flash.winner}</div>
-      <div className="sold-overlay-price">
-        {flash.name} · {flash.price}c
-      </div>
     </div>
   );
 }

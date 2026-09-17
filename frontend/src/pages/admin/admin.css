@@ -14,10 +14,9 @@
 }
 
 .badge-status {
-  background: var(--surface);
-  border: 1px solid var(--line-strong);
-  color: var(--accent-deep);
-  text-transform: uppercase;
+  background: var(--bg-deep);
+  border: 1px solid var(--line);
+  color: var(--navy-700);
 }
 
 .admin-waiting { padding: 44px 0; max-width: 520px; margin: 40px auto; }
@@ -26,11 +25,11 @@
 
 .name-pill {
   background: var(--info-bg);
-  color: var(--info);
+  color: var(--navy-700);
   padding: 6px 14px;
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   font-size: 0.9em;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .admin-grid {
@@ -54,7 +53,7 @@
   padding-left: 20px;
   border-left: var(--hairline);
 }
-.player-table h3 { font-size: 1.1em; text-transform: uppercase; margin-bottom: 12px; }
+.player-table h3 { font-size: 1.1em; margin-bottom: 12px; }
 .player-table table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
 .player-table th {
   text-align: left;
@@ -62,10 +61,11 @@
   font-size: 0.72em;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: 600;
   color: var(--ink-faint);
   border-bottom: 2px solid var(--line);
 }
-.player-table td { padding: 9px 4px; border-bottom: 1px solid var(--line); font-weight: 600; }
+.player-table td { padding: 9px 4px; border-bottom: 1px solid var(--line); font-weight: 500; }
 .player-table tr.disconnected { opacity: 0.45; }
 
 .price-input { width: 76px; }

@@ -25,7 +25,7 @@ export function ParticipantProvider({ session, onSummary, children }) {
         if (prevItem && prevItem.id !== (newItem && newItem.id) && prevItem.currentBidderName) {
           setSoldFlash({ name: prevItem.name, winner: prevItem.currentBidderName, price: prevItem.currentBid });
           if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
-          flashTimerRef.current = setTimeout(() => setSoldFlash(null), 1800);
+          flashTimerRef.current = setTimeout(() => setSoldFlash(null), 2600);
         }
         prevItemRef.current = newItem
           ? { id: newItem.id, name: newItem.name, currentBidderName: newItem.currentBidderName, currentBid: newItem.currentBid }

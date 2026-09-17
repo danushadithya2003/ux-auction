@@ -1,12 +1,13 @@
-// Each category gets a consistent accent color, used sparingly for tags
-// and eyebrow labels - not big decorative blocks.
+// Each category gets a consistent accent, drawn from a desaturated
+// navy/blue/slate spectrum (never a bright or playful hue) - used
+// sparingly for tags, eyebrow labels, and its numbered mark.
 
 export const CATEGORY_COLORS = [
-  { accent: "#5B7FA6", soft: "#EAF1F8", name: "blue" },
-  { accent: "#9A6FB0", soft: "#F1E9F6", name: "purple" },
-  { accent: "#4C8C5B", soft: "#E9F4EA", name: "green" },
-  { accent: "#C98A2C", soft: "#FBF0DC", name: "amber" },
-  { accent: "#C85A7A", soft: "#FBEAF0", name: "pink" },
+  { accent: "#0072CE", soft: "#E8F2FC", name: "blue" },
+  { accent: "#0A1F44", soft: "#E9EDF3", name: "navy" },
+  { accent: "#4C7A8C", soft: "#EAF0F2", name: "teal" },
+  { accent: "#1E4C8A", soft: "#EAF0F8", name: "slate-blue" },
+  { accent: "#6B7686", soft: "#EEF0F3", name: "slate" },
 ];
 
 export function colorForCategory(categoryIdOrName, categories) {
@@ -14,5 +15,5 @@ export function colorForCategory(categoryIdOrName, categories) {
     const idx = categories.findIndex((c) => c.id === categoryIdOrName || c.name === categoryIdOrName);
     if (idx >= 0) return CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
   }
-  return { accent: "#8A7F6D", soft: "#EDE6D8", name: "neutral" };
+  return { accent: "#6B7686", soft: "#EEF0F3", name: "neutral" };
 }

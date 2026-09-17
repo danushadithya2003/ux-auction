@@ -2,12 +2,16 @@ import { useState } from "react";
 import { useAdmin } from "../../context/AdminContext";
 import AuctionSummary from "../../components/AuctionSummary";
 import TimerRing from "../../components/TimerRing";
+import SoldPopup from "../../components/SoldPopup";
 import { clearAdminSession } from "../../api/store";
 import "../../components/components.css";
 import "./admin.css";
 
 export default function AdminApp() {
   const { state, act, soldFlash } = useAdmin();
+  const [confirmState, setConfirmState] = useState(null);
+  const askConfirm = (message, onConfirm) => setConfirmState({ message, onConfirm });
+
   if (!state) return <p className="muted" style={{ padding: 40 }}>Loading…</p>;
 
   if (state.role === "summary") {
@@ -36,7 +40,33 @@ export default function AdminApp() {
       {state.status === "PLANNING" && (
         <WaitingPanel title="Planning phase" subtitle="Participants are browsing the items." state={state} onGo={() => act("begin_bidding")} goLabel="Begin Bidding →" />
       )}
-      {(state.status === "LIVE" || state.status === "PAUSED") && <LiveDashboard state={state} act={act} soldFlash={soldFlash} />}
+      {(state.status === "LIVE" || state.status === "PAUSED") && <LiveDashboard state={state} act={act} soldFlash={soldFlash} askConfirm={askConfirm} />}
+      <ConfirmModal state={confirmState} onClose={() => setConfirmState(null)} />
+    </div>
+  );
+}
+
+function ConfirmModal({ state, onClose }) {
+  if (!state) return null;
+  return (
+    <div className="sold-backdrop" onClick={onClose}>
+      <div className="confirm-card" onClick={(e) => e.stopPropagation()}>
+        <p className="confirm-message">{state.message}</p>
+        <div className="confirm-actions">
+          <button className="btn btn-outline" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="btn btn-danger-solid"
+            onClick={() => {
+              state.onConfirm();
+              onClose();
+            }}
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -76,26 +106,18 @@ function WaitingPanel({ title, subtitle, state, onGo, goLabel }) {
   );
 }
 
-function LiveDashboard({ state, act, soldFlash }) {
+function LiveDashboard({ state, act, soldFlash, askConfirm }) {
   return (
     <div className="admin-grid">
       <div className="admin-main">
         <div className="item-stage">
-          {soldFlash && (
-            <div className="sold-overlay">
-              <div className="sold-overlay-label">Sold</div>
-              <div className="sold-overlay-winner">{soldFlash.winner}</div>
-              <div className="sold-overlay-price">
-                {soldFlash.name} · {soldFlash.price}c
-              </div>
-            </div>
-          )}
+          <SoldPopup flash={soldFlash} />
           {state.currentItem ? (
             <CurrentItemAdmin state={state} act={act} />
           ) : state.allCategoriesClosed ? (
             <div className="banner banner-success">
               <p>All categories are complete.</p>
-              <button className="btn btn-primary" onClick={() => confirmThen("End the auction for everyone?", () => act("end_auction"))}>
+              <button className="btn btn-primary" onClick={() => askConfirm("End the auction for everyone?", () => act("end_auction"))}>
                 End Auction
               </button>
             </div>
@@ -116,10 +138,10 @@ function LiveDashboard({ state, act, soldFlash }) {
               Resume
             </button>
           )}
-          <button className="btn btn-danger" onClick={() => confirmThen("End the auction now?", () => act("end_auction"))}>
+          <button className="btn btn-danger" onClick={() => askConfirm("End the auction now?", () => act("end_auction"))}>
             End Auction
           </button>
-          <button className="btn btn-text" onClick={() => confirmThen("Reset and discard this auction entirely?", () => act("reset_auction"))}>
+          <button className="btn btn-text" onClick={() => askConfirm("Reset and discard this auction entirely?", () => act("reset_auction"))}>
             Reset
           </button>
         </div>
@@ -307,8 +329,4 @@ function PlayerTable({ state }) {
       </table>
     </div>
   );
-}
-
-function confirmThen(message, fn) {
-  if (window.confirm(message)) fn();
 }
