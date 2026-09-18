@@ -264,10 +264,26 @@ def stream():
         try:
             while True:
                 try:
-                    msg = sub["queue"].get(timeout=15)
+                    msg = sub["queue"].get(timeout=1)
                     yield f"data: {msg}\n\n"
                 except queue.Empty:
-                    yield ": keep-alive\n\n"
+                    # Belt-and-suspenders: the standalone _timer_loop thread
+                    # should be doing this, but it depends on gunicorn actually
+                    # running the single-process/multi-thread model committed
+                    # in render.yaml. Ticking here too means the silence window
+                    # still resolves correctly even if a platform-level worker
+                    # config drifts from that (e.g. Render's dashboard Start
+                    # Command not picking up a render.yaml change) - as long as
+                    # *some* connection is open, which is always true mid-auction.
+                    ticked = False
+                    with lock:
+                        if current_auction and current_auction.code == code and current_auction.tick():
+                            _persist()
+                            ticked = True
+                    if ticked:
+                        _broadcast()
+                    else:
+                        yield ": keep-alive\n\n"
         finally:
             with lock:
                 subscribers.pop(sub_id, None)
