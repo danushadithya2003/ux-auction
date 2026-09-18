@@ -1,5 +1,3 @@
-import "../../components/components.css";
-
 const STEPS = [
   {
     title: "The scenario",
@@ -24,23 +22,45 @@ const STEPS = [
 ];
 
 export default function HowItWorks() {
+  const left = STEPS.slice(0, 3);
+  const right = STEPS.slice(3);
+
   return (
     <div>
-      <h2 style={{ marginBottom: 4 }}>How It Works</h2>
-      <p className="muted">The short version of the rules — the facilitator will cover the full scenario live.</p>
+      <h2 style={{ fontSize: 44, marginBottom: 4 }}>How It Works</h2>
+      <p className="muted" style={{ marginBottom: 26 }}>The short version of the rules — the facilitator will cover the full scenario live.</p>
 
-      <div className="how-it-works-list">
-        {STEPS.map((s, i) => (
-          <div className="how-it-works-step" key={s.title}>
-            <div className="how-it-works-num">{i + 1}</div>
-            <div>
-              <h4>{s.title}</h4>
-              <p className="muted" style={{ marginBottom: 0 }}>
-                {s.body}
-              </p>
+      <div className="how-shell">
+        <div className="how-col">
+          {left.map((s, i) => (
+            <div className="how-rule" key={s.title}>
+              <div className="how-numeral">{i + 1}</div>
+              <div>
+                <div className="how-rule-title">{s.title}</div>
+                <p className="how-rule-body">{s.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="how-col">
+          {right.map((s, i) => (
+            <div className="how-rule" key={s.title}>
+              <div className="how-numeral how-numeral-cyan">{i + 4}</div>
+              <div>
+                <div className="how-rule-title">{s.title}</div>
+                <p className="how-rule-body">{s.body}</p>
+              </div>
+            </div>
+          ))}
+          <div className="house-motto">
+            <div className="house-motto-label">HOUSE MOTTO</div>
+            <div className="house-motto-text">
+              Different resources.<br />
+              New perspectives.<br />
+              A better solution.
             </div>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

@@ -18,6 +18,13 @@ INCREMENTS = [1, 5, 10]
 SILENCE_SECONDS = 15
 CODE_ALPHABET = "ABCDEFGHJKLMNPQRTUVWXYZ2346789"  # no O/0, I/1, S/5
 
+# The next lot goes live the instant a sale is confirmed, but everyone's
+# screen is covered by the SOLD takeover for a couple of seconds first -
+# without this, that time is silently eaten out of their bidding window.
+# Padding the window by this much (only after a real sale, not a skip)
+# means the full SILENCE_SECONDS starts once people can actually see the lot.
+SOLD_POPUP_GRACE_SECONDS = 3
+
 
 class ValidationError(Exception):
     pass
@@ -76,6 +83,7 @@ class Auction:
                     "sold_to": None,
                     "sold_price": None,
                     "sale_type": None,
+                    "bid_feed": [],
                 })
             self.categories.append(category)
 
@@ -235,13 +243,14 @@ class Auction:
         cat["status"] = "OPEN"
         self._reveal_next_item(cat)
 
-    def _reveal_next_item(self, cat):
+    def _reveal_next_item(self, cat, grace_seconds=0):
         for it in cat["items"]:
             if it["status"] == "UNUSED":
                 it["status"] = "BIDDING"
                 it["current_bid"] = None
                 it["current_bidder_id"] = None
-                it["bidding_expires_at"] = time.time() + SILENCE_SECONDS
+                it["bidding_expires_at"] = time.time() + SILENCE_SECONDS + grace_seconds
+                it["bid_feed"] = [{"kind": "open", "name": None, "amount": it["starting_price"]}]
                 return it
         return None
 
@@ -281,9 +290,17 @@ class Auction:
         item["current_bid"] = amount
         item["current_bidder_id"] = participant_id
         item["bidding_expires_at"] = time.time() + SILENCE_SECONDS
+        item["bid_feed"].append({"kind": "bid", "name": participant["name"], "amount": amount})
+        item["bid_feed"] = item["bid_feed"][-3:]
 
     def tick(self):
-        """Call roughly once a second. Returns True if anything changed."""
+        """Call roughly once a second. Returns True if anything changed.
+
+        When the silence window lapses with a bid on the table, the item
+        moves to PENDING_CONFIRM so the Auctioneer confirms the sale by
+        hand. With no bid at all, nothing auto-resolves either - the timer
+        just sits at zero and the item stays open until the Auctioneer
+        explicitly skips it (or someone bids)."""
         if self.status != "LIVE":
             return False
         item = self.current_item()
@@ -291,11 +308,9 @@ class Auction:
             return False
         if item["bidding_expires_at"] is None or time.time() < item["bidding_expires_at"]:
             return False
-        if item["current_bidder_id"]:
-            item["status"] = "PENDING_CONFIRM"
-        else:
-            item["status"] = "UNSOLD_PENDING_REOFFER"
-            self._reveal_next_item(self._category(item["category_id"]))
+        if not item["current_bidder_id"]:
+            return False
+        item["status"] = "PENDING_CONFIRM"
         return True
 
     def _finalize_sale(self, item, participant_id, price, sale_type):
@@ -323,7 +338,7 @@ class Auction:
             raise ValidationError("There is no pending sale to confirm.")
         cat = self._category(item["category_id"])
         self._finalize_sale(item, item["current_bidder_id"], item["current_bid"], "NORMAL")
-        self._reveal_next_item(cat)
+        self._reveal_next_item(cat, grace_seconds=SOLD_POPUP_GRACE_SECONDS)
 
     def skip_item(self):
         item = self.current_item()
@@ -353,6 +368,7 @@ class Auction:
         item["current_bid"] = None
         item["current_bidder_id"] = None
         item["bidding_expires_at"] = time.time() + SILENCE_SECONDS
+        item["bid_feed"] = [{"kind": "open", "name": None, "amount": new_price}]
 
     def direct_grant(self, item_id, participant_id, price):
         item, cat = self.find_item(item_id)
@@ -372,8 +388,23 @@ class Auction:
         self._finalize_sale(item, participant_id, price, "CATCHUP_GRANT")
 
     def close_category_check(self):
+        """Participants still missing an item from the current category who
+        the Admin could still fix with a grant. Someone missing it is
+        excluded once there's nothing left in the category to give them -
+        otherwise the category could never close (a soft-lock)."""
         cat = self.current_category()
         if not cat:
+            return []
+        if self._cheapest_available(cat["id"]) is None:
+            return []
+        return [p["id"] for p in self.participants.values() if not self.owns_in_category(p["id"], cat["id"])]
+
+    def exempt_from_current_category(self):
+        """Participants missing an item from the current category who are
+        exempt because nothing is left to grant them - the flip side of
+        close_category_check()."""
+        cat = self.current_category()
+        if not cat or self._cheapest_available(cat["id"]) is not None:
             return []
         return [p["id"] for p in self.participants.values() if not self.owns_in_category(p["id"], cat["id"])]
 

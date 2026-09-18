@@ -18,7 +18,7 @@ export default function App() {
   const [mode, setMode] = useState("loading");
   const [adminSession, setAdminSessionState] = useState(null);
   const [participantSession, setParticipantSessionState] = useState(null);
-  const [summary, setSummary] = useState(null);
+  const [summaryInfo, setSummaryInfo] = useState(null); // { summary, viewerRole, myParticipantId }
 
   useEffect(() => {
     boot();
@@ -30,7 +30,7 @@ export default function App() {
     if (admin) {
       const result = await lookupCode(admin.code).catch(() => ({ found: false }));
       if (result.found && result.status === "COMPLETED") {
-        setSummary(result.summary);
+        setSummaryInfo({ summary: result.summary, viewerRole: "admin", myParticipantId: null });
         setMode("summary");
         return;
       }
@@ -46,7 +46,7 @@ export default function App() {
     if (participant) {
       const result = await lookupCode(participant.code).catch(() => ({ found: false }));
       if (result.found && result.status === "COMPLETED") {
-        setSummary(result.summary);
+        setSummaryInfo({ summary: result.summary, viewerRole: "participant", myParticipantId: participant.participantId });
         setMode("summary");
         return;
       }
@@ -61,26 +61,23 @@ export default function App() {
     setMode("landing");
   }
 
+  function backToStart() {
+    clearAdminSession();
+    clearParticipantSession();
+    window.location.href = "/";
+  }
+
   return (
     <BrowserRouter>
       {mode === "loading" && <p className="muted" style={{ padding: 40 }}>Loading…</p>}
 
-      {mode === "summary" && summary && (
-        <div>
-          <AuctionSummary summary={summary} />
-          <div style={{ textAlign: "center", paddingBottom: 40 }}>
-            <button
-              className="btn btn-outline"
-              onClick={() => {
-                clearAdminSession();
-                clearParticipantSession();
-                window.location.href = "/";
-              }}
-            >
-              Back to Start
-            </button>
-          </div>
-        </div>
+      {mode === "summary" && summaryInfo && (
+        <AuctionSummary
+          summary={summaryInfo.summary}
+          viewerRole={summaryInfo.viewerRole}
+          myParticipantId={summaryInfo.myParticipantId}
+          onBackToStart={backToStart}
+        />
       )}
 
       {mode === "landing" && (
@@ -109,7 +106,13 @@ export default function App() {
       )}
 
       {mode === "participant" && participantSession && (
-        <ParticipantProvider session={participantSession} onSummary={(s) => { setSummary(s); setMode("summary"); }}>
+        <ParticipantProvider
+          session={participantSession}
+          onSummary={(s) => {
+            setSummaryInfo({ summary: s, viewerRole: "participant", myParticipantId: participantSession.participantId });
+            setMode("summary");
+          }}
+        >
           <Routes>
             <Route element={<ParticipantLayout />}>
               <Route path="/play/live" element={<LiveAuction />} />

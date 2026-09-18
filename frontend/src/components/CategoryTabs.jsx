@@ -1,27 +1,23 @@
-import { colorForCategory } from "../theme/categories";
 import "./components.css";
 
-// Purely a viewing aid - during Live bidding the auction always dictates
-// which category/item is current; these tabs let a participant preview
-// other categories without affecting the live item anyone else sees.
-export default function CategoryTabs({ categories, activeId, onSelect, readOnly = false }) {
+// Used on All Items only - the bidding stage itself just labels the
+// current category as plain text, no tab switcher.
+export default function CategoryTabs({ categories, activeId, onSelect }) {
   return (
     <div className="category-tabs">
       {categories.map((c, i) => {
-        const theme = colorForCategory(c.id, categories);
         const active = c.id === activeId;
         return (
           <button
             key={c.id}
-            className={`category-tab${active ? " category-tab-active" : ""}${readOnly ? " category-tab-readonly" : ""}`}
-            style={active ? { color: theme.accent, borderColor: theme.accent } : undefined}
-            onClick={readOnly ? undefined : () => onSelect(c.id)}
+            className={`category-tab${active ? " category-tab-active" : ""}`}
+            onClick={() => onSelect(c.id)}
           >
-            <span className="category-tab-num" style={active ? { color: theme.accent } : undefined}>
-              {String(i + 1).padStart(2, "0")}
+            <span className="category-tab-num">{String(i + 1).padStart(2, "0")}</span>
+            <span className="category-tab-name">
+              {c.name}
+              {c.secured && <span className="category-tab-check">&#10003;</span>}
             </span>
-            {c.name}
-            {c.secured && <span className="category-tab-check">✓</span>}
           </button>
         );
       })}

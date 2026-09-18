@@ -16,6 +16,17 @@ def _time_remaining(item):
     return None
 
 
+def _bidding_expires_at(item):
+    # Raw epoch timestamp, not the rounded seconds-remaining above. A client
+    # ticking down from a rounded integer can get two updates that round to
+    # the same number (e.g. a bid landing moments after a reveal both read
+    # as "15") and never notice the deadline actually moved - ticking
+    # against this exact timestamp instead avoids that class of bug.
+    if item and item.get("status") == "BIDDING" and item.get("bidding_expires_at"):
+        return item["bidding_expires_at"]
+    return None
+
+
 def _bid_options_for(item, participant_balance, reserve):
     if not item or item["status"] != "BIDDING":
         return []
@@ -83,6 +94,8 @@ def admin_view(auction):
             "currentBid": current_item["current_bid"],
             "currentBidderName": auction.participants.get(current_item["current_bidder_id"], {}).get("name") if current_item["current_bidder_id"] else None,
             "timeRemaining": _time_remaining(current_item),
+            "biddingExpiresAt": _bidding_expires_at(current_item),
+            "bidFeed": [{"kind": e["kind"], "name": e["name"], "amount": e["amount"]} for e in current_item.get("bid_feed", [])],
         }
 
     missing_suggestions = []
@@ -116,6 +129,9 @@ def admin_view(auction):
         "participants": participants,
         "missingForCurrentCategory": [
             auction.participants[pid]["name"] for pid in auction.close_category_check()
+        ] if current_category else [],
+        "exemptForCurrentCategory": [
+            auction.participants[pid]["name"] for pid in auction.exempt_from_current_category()
         ] if current_category else [],
         "missingGrantSuggestions": missing_suggestions,
         "allCategoriesClosed": auction.current_category_index >= len(auction.categories),
@@ -197,7 +213,9 @@ def participant_view(auction, participant_id):
             "currentBidderName": bidder["name"] if bidder else None,
             "isMine": current_item["current_bidder_id"] == participant_id,
             "timeRemaining": _time_remaining(current_item),
+            "biddingExpiresAt": _bidding_expires_at(current_item),
             "bidOptions": _bid_options_for(current_item, participant["balance"], reserve),
+            "bidFeed": [{"kind": e["kind"], "name": e["name"], "amount": e["amount"]} for e in current_item.get("bid_feed", [])],
         }
 
     return {
@@ -234,7 +252,7 @@ def public_summary(auction):
                 "price": pur["price"],
                 "saleType": pur["sale_type"],
             })
-        participants.append({"name": p["name"], "finalBalance": p["balance"], "collection": collection})
+        participants.append({"id": p["id"], "name": p["name"], "finalBalance": p["balance"], "collection": collection})
 
     return {
         "role": "summary",
