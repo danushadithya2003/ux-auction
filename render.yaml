@@ -1,3 +1,10 @@
+# NOTE: on a Render "Web Service" (not a Blueprint), this file's startCommand
+# is only used the first time the service is created from it - if you ever
+# change startCommand here later, also update it by hand in the Render
+# dashboard, since Render does not re-sync it from render.yaml on its own.
+# --workers 1 matters: app.py keeps the one active auction in a plain
+# in-memory object shared by every request, so more than one worker
+# *process* would each get its own disconnected copy of that state.
 services:
   - type: web
     name: ux-auction
