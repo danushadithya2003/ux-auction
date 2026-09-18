@@ -4,7 +4,7 @@ Durable storage for auctions.
 Each auction is stored as a single JSON blob keyed by its invite code.
 This is intentionally simple (no relational schema/migrations) given the
 scale of this app - a handful of auctions, each with at most ~10 players
-and ~50 items. It exists so that:
+and ~40 items. It exists so that:
   - a completed auction's code keeps resolving to its summary indefinitely
   - the server can recover the in-progress auction after a restart
 """

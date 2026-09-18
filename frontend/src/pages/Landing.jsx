@@ -46,7 +46,7 @@ export default function Landing({ onAdminReady, onParticipantReady }) {
         </div>
         <div className="entry-stat-row">
           <Stat value="5" label="CATEGORIES" />
-          <Stat value="50" label="LOTS" />
+          <Stat value="40" label="LOTS" />
           <Stat value="100c" label="PURSE" />
           <Stat value="15s" label="BID WINDOW" />
         </div>

@@ -161,7 +161,7 @@ function Lobby({ state, act }) {
         <div className="admin-spec-list">
           <div className="hud-label" style={{ marginBottom: 4 }}>THIS AUCTION</div>
           <div className="admin-spec-row"><span>Categories</span><strong>5</strong></div>
-          <div className="admin-spec-row"><span>Lots</span><strong>50</strong></div>
+          <div className="admin-spec-row"><span>Lots</span><strong>40</strong></div>
           <div className="admin-spec-row"><span>Purse each</span><strong>100c</strong></div>
           <div className="admin-spec-row"><span>Bid window</span><strong>15s</strong></div>
         </div>
